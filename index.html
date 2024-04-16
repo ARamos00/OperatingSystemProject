@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File System Simulator</title>
+</head>
+<body>
+<h1>File System Simulator</h1>
+<div id="file-system-operations">
+    <!-- Forms for creating, deleting, writing, and reading -->
+    <form onsubmit="handleCreate(event)">
+        <select id="parent-dir" class="filesystem-select" required></select>
+        <input type="text" id="entry-name" placeholder="Name of New File/Directory" required>
+        <select id="type-select">
+            <option value="D">Directory</option>
+            <option value="U">File</option>
+        </select>
+        <button type="submit">Create</button>
+    </form>
+    <form onsubmit="handleDelete(event)">
+        <select id="delete-path" class="filesystem-select" required></select>
+        <button type="submit">Delete</button>
+    </form>
+    <form onsubmit="handleWrite(event)">
+        <select id="write-file-name" class="filesystem-select" required></select>
+        <textarea id="file-content" placeholder="Content to Write"></textarea>
+        <button type="submit">Write</button>
+    </form>
+    <select id="read-file-name" class="filesystem-select" required></select>
+    <button onclick="handleRead()">Read from File</button>
+</div>
+<div id="test-buttons" style="margin-top: 20px;">
+    <!-- Quick Test Buttons -->
+    <button onclick="createEntry('root', 'Documents', 'D'); updateDisplay();">Create Directory 'Documents'</button>
+    <button onclick="createEntry('Documents', 'TestFile.txt', 'U'); updateDisplay();">Create File 'TestFile.txt' in 'Documents'</button>
+    <button onclick="writeToFile('Documents/TestFile.txt', 'Hello World'); updateDisplay();">Write 'Hello World' to 'TestFile.txt'</button>
+    <button onclick="alert(readFromFile('Documents/TestFile.txt'));">Read from 'TestFile.txt'</button>
+    <button onclick="deleteEntry('Documents/TestFile.txt'); updateDisplay();">Delete 'TestFile.txt'</button>
+    <button onclick="deleteEntry('Documents'); updateDisplay();">Delete 'Documents'</button>
+</div>
+<div id="file-system-status">
+    <pre id="output"></pre>
+</div>
+
+<script src="file-system.js"></script>
+</body>
+</html>
