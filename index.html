@@ -6,72 +6,62 @@
     <title>File System Simulator</title>
     <style>
         body {
-            position: relative;
-            height: 100vh;
-            margin: 0;
             font-family: Arial, sans-serif;
+            padding: 20px;
         }
-        #command-guide {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            width: 300px;
-            height: 150px;
+        #cli {
+            margin-bottom: 20px;
+        }
+        #output, #commands {
+            white-space: pre;
             background-color: #f0f0f0;
-            border: 1px solid #ccc;
             padding: 10px;
-            box-sizing: border-box;
-            overflow-y: auto;
-            resize: none;
+            border: 1px solid #ccc;
+            overflow: auto;
+            width: 98%;
+            min-height: 100px;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 <h1>File System Simulator</h1>
-<div id="file-system-operations">
-    <!-- Forms for creating, deleting, writing, and reading -->
-    <form onsubmit="handleCreate(event)">
-        <input type="text" id="parent-dir" placeholder="Parent Directory Path" required>
-        <input type="text" id="entry-name" placeholder="Name of New File/Directory" required>
-        <select id="type-select">
-            <option value="D">Directory</option>
-            <option value="U">File</option>
-        </select>
-        <button type="submit">Create</button>
-    </form>
-    <form onsubmit="handleDelete(event)">
-        <input type="text" id="delete-path" placeholder="Path to Delete" required>
-        <button type="submit">Delete</button>
-    </form>
-    <form onsubmit="handleWrite(event)">
-        <input type="text" id="write-file-name" placeholder="Path to File for Writing" required oninput="console.log(this.value);">
-        <textarea id="file-content" placeholder="Content to Write"></textarea>
-        <button type="submit">Write</button>
-    </form>
-    <input type="text" id="read-file-name" placeholder="Path to File for Reading" required>
-    <button onclick="handleRead()">Read from File</button>
+<div id="cli">
+    <input type="text" id="command-input" placeholder="Enter command here" style="width: 80%;">
+    <button onclick="processCommand()">Execute</button>
 </div>
-<div id="test-buttons" style="margin-top: 20px;">
-    <!-- Quick Test Buttons -->
-    <button onclick="createEntry('root', 'Documents', 'D'); updateDisplay();">Create Directory 'Documents'</button>
-    <button onclick="createEntry('Documents', 'TestFile.txt', 'U'); updateDisplay();">Create File 'TestFile.txt' in 'Documents'</button>
-    <button onclick="writeToFile('Documents/TestFile.txt', 'Hello World'); updateDisplay();">Write 'Hello World' to 'TestFile.txt'</button>
-    <button onclick="alert(readFromFile('Documents/TestFile.txt'));">Read from 'TestFile.txt'</button>
-    <button onclick="deleteEntry('Documents/TestFile.txt'); updateDisplay();">Delete 'TestFile.txt'</button>
-    <button onclick="deleteEntry('Documents'); updateDisplay();">Delete 'Documents'</button>
+<div id="test-buttons">
+    <button onclick="testCreateFile()">Create File</button>
+    <button onclick="testCreateDirectory()">Create Directory</button>
+    <button onclick="testWriteToFile()">Write to File</button>
+    <button onclick="testReadFromFile()">Read from File</button>
+    <button onclick="testDeleteFile()">Delete File</button>
 </div>
 <div id="file-system-status">
     <pre id="output"></pre>
 </div>
-<textarea id="command-guide" readonly>
-Commands Guide:
-- Create Directory: "root", "Directory Name"
-- Create File: "Parent Directory", "File Name"
-- Write to File: "File Path", "Content"
-- Read from File: "File Path"
-- Delete File/Directory: "File/Directory Path"
+<div id="commands">
+    <label for="command-list">Command List (Copy & Paste):</label>
+    <textarea id="command-list" rows="10" cols="50" readonly>
+CREATE D root/Documents
+CREATE D root/Documents/Work
+CREATE U root/Documents/Work/project.docx
+WRITE root/Documents/Work/project.docx "This is a document."
+READ root/Documents/Work/project.docx
+DELETE root/Documents/Work/project.docx
+CREATE U root/image.png
+WRITE root/image.png "This is a pseudo-image file stored as text."
+READ root/image.png
+DELETE root/image.png
+OPEN O root/Documents/Work/project.docx
+READ 100
+WRITE 20 "Update with more text."
+SEEK 0 10
+CLOSE
+DELETE root/Documents/Work
 </textarea>
 
+</div>
 <script src="file-system.js"></script>
 </body>
 </html>
