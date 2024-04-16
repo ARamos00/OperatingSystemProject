@@ -4,13 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File System Simulator</title>
+    <style>
+        body {
+            position: relative;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #command-guide {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 300px;
+            height: 150px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            padding: 10px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            resize: none;
+        }
+    </style>
 </head>
 <body>
 <h1>File System Simulator</h1>
 <div id="file-system-operations">
     <!-- Forms for creating, deleting, writing, and reading -->
     <form onsubmit="handleCreate(event)">
-        <select id="parent-dir" class="filesystem-select" required></select>
+        <input type="text" id="parent-dir" placeholder="Parent Directory Path" required>
         <input type="text" id="entry-name" placeholder="Name of New File/Directory" required>
         <select id="type-select">
             <option value="D">Directory</option>
@@ -19,15 +40,15 @@
         <button type="submit">Create</button>
     </form>
     <form onsubmit="handleDelete(event)">
-        <select id="delete-path" class="filesystem-select" required></select>
+        <input type="text" id="delete-path" placeholder="Path to Delete" required>
         <button type="submit">Delete</button>
     </form>
     <form onsubmit="handleWrite(event)">
-        <select id="write-file-name" class="filesystem-select" required></select>
+        <input type="text" id="write-file-name" placeholder="Path to File for Writing" required oninput="console.log(this.value);">
         <textarea id="file-content" placeholder="Content to Write"></textarea>
         <button type="submit">Write</button>
     </form>
-    <select id="read-file-name" class="filesystem-select" required></select>
+    <input type="text" id="read-file-name" placeholder="Path to File for Reading" required>
     <button onclick="handleRead()">Read from File</button>
 </div>
 <div id="test-buttons" style="margin-top: 20px;">
@@ -42,6 +63,14 @@
 <div id="file-system-status">
     <pre id="output"></pre>
 </div>
+<textarea id="command-guide" readonly>
+Commands Guide:
+- Create Directory: "root", "Directory Name"
+- Create File: "Parent Directory", "File Name"
+- Write to File: "File Path", "Content"
+- Read from File: "File Path"
+- Delete File/Directory: "File/Directory Path"
+</textarea>
 
 <script src="file-system.js"></script>
 </body>

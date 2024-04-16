@@ -4,23 +4,14 @@ const blockSize = 512;
 let disk = new Array(diskSize).fill(null);
 
 function DREAD(blockNumber) {
-    if (!disk[blockNumber]) {
-        console.error("Disk read error: Block", blockNumber, "is empty.");
-        return null;
-    }
-    return JSON.parse(disk[blockNumber]);
+    return disk[blockNumber] ? JSON.parse(disk[blockNumber]) : null;
 }
 
 function DWRITE(blockNumber, data) {
-    try {
-        const dataToWrite = JSON.stringify(data, (key, value) => {
-            if (key === 'parent') return undefined; // Prevent circular reference issues
-            return value;
-        });
-        disk[blockNumber] = dataToWrite;
-    } catch (error) {
-        console.error("Failed to write to disk:", error);
-    }
+    disk[blockNumber] = JSON.stringify(data, (key, value) => {
+        if (key === 'parent') return undefined; // Avoid circular references
+        return value;
+    });
 }
 
 class FileSystemEntry {
@@ -67,25 +58,27 @@ class File extends FileSystemEntry {
 }
 
 let rootDirectory = new Directory('root');
-DWRITE(0, rootDirectory); // Initial write to set up the root directory on the disk
+DWRITE(0, rootDirectory);
 
 function resolvePath(path) {
     let current = rootDirectory;
+    console.log("Resolving path:", path);
     if (path === 'root') return current;
     const parts = path.split('/').filter(Boolean);
     for (const part of parts) {
         current = current instanceof Directory ? current.findEntry(part) : null;
         if (!current) {
-            console.error("Path not found: " + path);
+            console.error("Path not found: " + path + " at segment: " + part);
             return null;
         }
     }
     return current;
 }
 
+
+
 function updateDisk() {
     DWRITE(0, rootDirectory);
-    updateDropdowns();
 }
 
 function createEntry(parentDirName, entryName, type) {
@@ -127,54 +120,109 @@ function readFromFile(path) {
 }
 
 function writeToFile(path, data) {
-    const file = resolvePath(path);
-    if (file && file instanceof File) {
-        file.writeData(data);
-        updateDisk();
-    } else {
-        console.error('File not found or is not a user file');
+    let file = resolvePath(path);
+    if (!file || !(file instanceof File)) {
+        console.log("File not found, creating new file at: " + path);
+        const parts = path.split('/');
+        const fileName = parts.pop();
+        const parentPath = parts.join('/');
+        const parentDir = resolvePath(parentPath);
+        if (parentDir && parentDir instanceof Directory) {
+            file = new File(fileName);
+            parentDir.addEntry(file);
+            updateDisk();
+        } else {
+            console.error('Parent directory not found for new file: ' + parentPath);
+            return;
+        }
     }
+    file.writeData(data);
+    updateDisk();
 }
 
-function getAllPaths(directory = rootDirectory, prefix = '') {
-    let paths = [directory.name ? prefix + (prefix ? '/' : '') + directory.name : 'root'];
-    if (directory instanceof Directory) {
-        directory.children.forEach(child => {
-            paths = paths.concat(getAllPaths(child, paths[0]));
-        });
-    }
-    return paths;
-}
-
-function updateDropdowns() {
-    const paths = getAllPaths();
-    const selectElements = document.querySelectorAll('.filesystem-select');
-    selectElements.forEach(select => {
-        select.innerHTML = '';  // Clear existing options
-        paths.forEach(path => {
-            const option = document.createElement('option');
-            option.value = option.textContent = path;
-            select.appendChild(option);
-        });
-    });
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    updateDropdowns();
-    setupEventListeners();
-});
 
 function setupEventListeners() {
-    document.getElementById('create-documents-dir').addEventListener('click', function() {
-        createEntry('root', 'Documents', 'D');
-        updateDisplay();
-    });
+    const createDirButton = document.getElementById('create-directory-button');
+    if (createDirButton) {
+        createDirButton.addEventListener('click', function() {
+            createEntry('root', 'Documents', 'D');
+        });
+    }
+
+    const createFileButton = document.getElementById('create-file-button');
+    if (createFileButton) {
+        createFileButton.addEventListener('click', function() {
+            createEntry('Documents', 'TestFile.txt', 'U');
+        });
+    }
+
+    const writeFileButton = document.getElementById('write-file-button');
+    if (writeFileButton) {
+        writeFileButton.addEventListener('click', function() {
+            writeToFile('Documents/TestFile.txt', 'Hello World');
+        });
+    }
+
+    const readFileButton = document.getElementById('read-file-button');
+    if (readFileButton) {
+        readFileButton.addEventListener('click', function() {
+            const content = readFromFile('Documents/TestFile.txt');
+            alert('Read from file: ' + content);
+        });
+    }
+
+    const deleteFileButton = document.getElementById('delete-file-button');
+    if (deleteFileButton) {
+        deleteFileButton.addEventListener('click', function() {
+            deleteEntry('Documents/TestFile.txt');
+        });
+    }
+
+    const deleteDirButton = document.getElementById('delete-directory-button');
+    if (deleteDirButton) {
+        deleteDirButton.addEventListener('click', function() {
+            deleteEntry('Documents');
+        });
+    }
+}
+function handleCreate(event) {
+    event.preventDefault();
+    const parentDir = document.getElementById('parent-dir').value;
+    const entryName = document.getElementById('entry-name').value;
+    const type = document.getElementById('type-select').value;
+    createEntry(parentDir, entryName, type);
+    updateDisplay();
 }
 
+function handleDelete(event) {
+    event.preventDefault();
+    const path = document.getElementById('delete-path').value;
+    deleteEntry(path);
+    updateDisplay();
+}
+
+function handleWrite(event) {
+    event.preventDefault();
+    const path = document.getElementById('write-file-name').value;
+    const data = document.getElementById('file-content').value;
+    writeToFile(path, data);
+    updateDisplay();
+}
+
+function handleRead() {
+    const filePath = document.getElementById('read-file-name').value;
+    const content = readFromFile(filePath);
+    alert('Content of ' + filePath + ': ' + content);
+}
 function updateDisplay() {
     const output = document.getElementById('output');
-    output.textContent = JSON.stringify(rootDirectory, (key, value) => {
-        if (key === 'parent') return undefined;  // Ignore parent properties to prevent circular references.
-        return value;
-    }, 2);
+    if (output) {
+        output.textContent = JSON.stringify(rootDirectory, (key, value) => {
+            if (key === 'parent') return undefined;  // Exclude the parent property to prevent circular references
+            return value;
+        }, 2);
+    } else {
+        console.error("Display element not found!");
+    }
 }
+
