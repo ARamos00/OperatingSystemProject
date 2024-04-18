@@ -31,22 +31,36 @@ function DWRITE(blockNumber, data) {
 
 function createFile(path, type) {
     let parts = path.split('/');
-    let fileName = parts.pop();
-    let parentPath = parts.join('/') || 'root'; // Default to root if no path left
-    let parentDir = resolvePath(parentPath);
-    if (parentDir && parentDir.type === 'D') {
-        if (parentDir.children.some(child => child.name === fileName)) {
-            console.error('File or directory already exists');
-            return;
+    let fileName = parts.pop(); // The last part is the file or final directory to create
+    let currentDir = rootDirectory;
+
+    // Traverse or create necessary directories
+    for (let i = 0; i < parts.length; i++) {
+        let part = parts[i];
+        let found = currentDir.children.find(child => child.name === part);
+        if (!found) {
+            // Directory doesn't exist, create it
+            let newDir = new FileSystemEntry(part, 'D'); // Ensuring 'D' is explicitly set for directories
+            currentDir.children.push(newDir);
+            currentDir = newDir;
+            console.log(`Created directory: ${part}`);
+        } else {
+            currentDir = found; // Move into the existing directory
         }
-        let newEntry = new FileSystemEntry(fileName, type);
-        parentDir.children.push(newEntry);
-        console.log(`Created ${type === 'D' ? 'directory' : 'file'}: ${fileName}`);
-        console.log(`Updated parent directory (${parentDir.name}):`, JSON.stringify(parentDir));
-    } else {
-        console.error('Invalid parent directory');
     }
+
+    // Now create the file or final directory
+    if (currentDir.children.some(child => child.name === fileName)) {
+        console.error('File or directory already exists');
+        return;
+    }
+    let newEntry = new FileSystemEntry(fileName, type); // Ensure that 'type' is correctly used here
+    currentDir.children.push(newEntry);
+    console.log(`Created ${type === 'D' ? 'directory' : 'file'}: ${fileName}`);
+    console.log(`Updated parent directory (${currentDir.name}):`, JSON.stringify(currentDir));
 }
+
+
 function deleteFile(path) {
     let parts = path.split('/');
     let fileName = parts.pop();
@@ -211,24 +225,24 @@ function processCommand() {
 
 
 function resolvePath(path) {
-    if (path === 'root') return rootDirectory;  // Ensures that the root directory is directly returned if specified
+    console.log(`Resolving path: ${path}`);
+    if (path === 'root') return rootDirectory;  // Direct return if path is 'root'
 
     let parts = path.split('/').filter(part => part.trim() !== '');
-    if (parts[0] === 'root') { // Ensures that paths starting with 'root/' are handled properly
-        parts.shift(); // Remove the 'root' part to start resolution from rootDirectory
-    }
     let current = rootDirectory;
 
     for (let part of parts) {
         let found = current.children.find(child => child.name === part);
         if (!found) {
-            console.error('Path not found: ' + path);
+            console.error('Path not found:', path);
             return null;
         }
         current = found;
+        console.log(`Traversing to: ${current.name}`);
     }
     return current;
 }
+
 
 
 
