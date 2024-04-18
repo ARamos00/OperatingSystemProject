@@ -12,7 +12,7 @@
         #cli {
             margin-bottom: 20px;
         }
-        #output, #commands {
+        #output, #file-details {
             white-space: pre;
             background-color: #f0f0f0;
             padding: 10px;
@@ -30,38 +30,28 @@
     <input type="text" id="command-input" placeholder="Enter command here" style="width: 80%;">
     <button onclick="processCommand()">Execute</button>
 </div>
-<div id="test-buttons">
-    <button onclick="testCreateFile()">Create File</button>
-    <button onclick="testCreateDirectory()">Create Directory</button>
-    <button onclick="testWriteToFile()">Write to File</button>
-    <button onclick="testReadFromFile()">Read from File</button>
-    <button onclick="testDeleteFile()">Delete File</button>
-</div>
 <div id="file-system-status">
     <pre id="output"></pre>
 </div>
-<div id="commands">
-    <label for="command-list">Command List (Copy & Paste):</label>
-    <textarea id="command-list" rows="10" cols="50" readonly>
-CREATE D root/Documents
-CREATE D root/Documents/Work
-CREATE U root/Documents/Work/project.docx
-WRITE root/Documents/Work/project.docx "This is a document."
-READ root/Documents/Work/project.docx
-DELETE root/Documents/Work/project.docx
-CREATE U root/image.png
-WRITE root/image.png "This is a pseudo-image file stored as text."
-READ root/image.png
-DELETE root/image.png
-OPEN O root/Documents/Work/project.docx
-READ 100
-WRITE 20 "Update with more text."
-SEEK 0 10
-CLOSE
-DELETE root/Documents/Work
-</textarea>
-
+<div id="opened-file-details">
+    <label for="file-details">Opened File Details:</label>
+    <pre id="file-details"></pre>
 </div>
 <script src="file-system.js"></script>
+<button onclick="fullFileOperationAsync()">Run Full File Operation</button>
 </body>
+<div id="command-guide" style="margin-top: 20px;">
+    <label for="command-list" style="display: block; margin-bottom: 10px; font-size: 16px; font-weight: bold;">Command Sequence for Full Operation:</label>
+    <textarea id="command-list" rows="15" cols="70" readonly style="font-family: monospace; font-size: 14px; padding: 10px; border: 2px solid #ccc; border-radius: 5px; background-color: #f8f8f8; width: 100%; max-width: 600px; height: 200px;">
+CREATE root/CompleteTestFile.txt U
+OPEN root/CompleteTestFile.txt O
+WRITE root/CompleteTestFile.txt "This is a test content."
+SEEK root/CompleteTestFile.txt 0 5
+READ root/CompleteTestFile.txt
+CLOSE root/CompleteTestFile.txt
+DELETE root/CompleteTestFile.txt
+    </textarea>
+</div>
+
+
 </html>
