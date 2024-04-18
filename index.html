@@ -4,54 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File System Simulator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-        #cli {
-            margin-bottom: 20px;
-        }
-        #output, #file-details {
-            white-space: pre;
-            background-color: #f0f0f0;
-            padding: 10px;
-            border: 1px solid #ccc;
-            overflow: auto;
-            width: 98%;
-            min-height: 100px;
-            margin-top: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<h1>File System Simulator</h1>
-<div id="cli">
-    <input type="text" id="command-input" placeholder="Enter command here" style="width: 80%;">
-    <button onclick="processCommand()">Execute</button>
-</div>
-<div id="file-system-status">
-    <pre id="output"></pre>
-</div>
-<div id="opened-file-details">
-    <label for="file-details">Opened File Details:</label>
-    <pre id="file-details"></pre>
-</div>
+<header>
+    <h1>File System Simulator</h1>
+</header>
+<main>
+    <section class="command-section">
+        <input type="text" id="command-input" placeholder="Enter command here">
+        <button onclick="processCommand()">Execute</button>
+    </section>
+    <section id="debug-log" class="debug-log">
+        <pre id="debug-messages"></pre>
+    </section>
+    <section id="file-system-status" class="output-area">
+        <pre id="output"></pre>
+    </section>
+    <section id="opened-file-details" class="output-area">
+        <h2>Opened File Details:</h2>
+        <pre id="file-details"></pre>
+    </section>
+</main>
+<footer>
+    <button onclick="fullFileOperationAsync()">Run Full File Operation</button>
+    <div id="command-key-box" class="command-key-box">
+        <h3>Command Keys</h3>
+        <p><strong>CREATE:</strong> Create a new file or directory</p>
+        <p><strong>OPEN:</strong> Open a file</p>
+        <p><strong>WRITE:</strong> Write to a file</p>
+        <p><strong>READ:</strong> Read a file</p>
+        <p><strong>DELETE:</strong> Delete a file or directory</p>
+        <p><strong>CLOSE:</strong> Close a file</p>
+        <p><strong>SEEK:</strong> Move the read/write pointer in a file</p>
+    </div>
+
+</footer>
 <script src="file-system.js"></script>
-<button onclick="fullFileOperationAsync()">Run Full File Operation</button>
+
+
 </body>
-<div id="command-guide" style="margin-top: 20px;">
-    <label for="command-list" style="display: block; margin-bottom: 10px; font-size: 16px; font-weight: bold;">Command Sequence for Full Operation:</label>
-    <textarea id="command-list" rows="15" cols="70" readonly style="font-family: monospace; font-size: 14px; padding: 10px; border: 2px solid #ccc; border-radius: 5px; background-color: #f8f8f8; width: 100%; max-width: 600px; height: 200px;">
-CREATE root/CompleteTestFile.txt U
-OPEN root/CompleteTestFile.txt O
-WRITE root/CompleteTestFile.txt "This is a test content."
-SEEK root/CompleteTestFile.txt 0 5
-READ root/CompleteTestFile.txt
-CLOSE root/CompleteTestFile.txt
-DELETE root/CompleteTestFile.txt
-    </textarea>
-</div>
-
-
 </html>

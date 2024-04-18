@@ -120,7 +120,8 @@ function seekFile(path, base, offset) {
 
 function updateDisplay() {
     const output = document.getElementById('output');
-    output.textContent = JSON.stringify(rootDirectory, null, 2);
+    // Assuming you have a way to convert the root directory to a displayable format
+    output.textContent = JSON.stringify(rootDirectory, null, 2); // Pretty print the root directory
 }
 
 function updateFileDetails(filePath) {
@@ -234,12 +235,19 @@ function resolvePath(path) {
 
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize the command input event handler
     document.getElementById('command-input').addEventListener('keyup', function(event) {
         if (event.key === 'Enter') {
             processCommand();
         }
     });
+
+    // Display initial system message and root directory
+    logMessage("File System Simulator initialized.", 'good');
+    updateDisplay(); // This will show the root directory in the display box
 });
+
+
 
 function testCreateFile() {
     processCommand('CREATE U root/TestFile.txt');  // Check if the root directory is 'root/' or 'root'
@@ -327,6 +335,35 @@ async function fullFileOperationAsync() {
     }
 }
 
+function logMessage(message, type) {
+    const debugLog = document.getElementById('debug-messages');
+    let messageElement = document.createElement('div');  // Create a new div for each message
 
-// Replace the simple button click handler with this if using asynchronous operations:
-// <button onclick="fullFileOperationAsync()">Run Full File Operation</button>
+    // Determine message type and set color accordingly
+    if (type === 'error') {
+        messageElement.style.color = 'red';  // Errors in red
+    } else if (type === 'good') {
+        messageElement.style.color = 'green';  // Good messages in green
+    } else {
+        messageElement.style.color = 'white';  // Default color for other messages
+    }
+
+    messageElement.textContent = message;
+    debugLog.appendChild(messageElement);  // Append the new div to the debug log
+
+    debugLog.scrollTop = debugLog.scrollHeight;  // Auto-scroll to the latest message
+}
+
+// Override console.log to use logMessage with 'good' type
+const originalConsoleLog = console.log;
+console.log = function(message) {
+    logMessage(message, 'good');  // Assume general logs are 'good'
+    originalConsoleLog.apply(console, arguments);
+};
+
+// Override console.error to use logMessage with 'error' type
+const originalConsoleError = console.error;
+console.error = function(message) {
+    logMessage(message, 'error');  // Errors are marked as 'error'
+    originalConsoleError.apply(console, arguments);
+};
