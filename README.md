@@ -6,7 +6,7 @@ I built a **from-scratch file system simulator** that runs in the browser. It mo
 
 * **Vanilla stack**: plain **JavaScript**, **HTML**, and **CSS** (no frameworks).
 * **Single-page UI** served by `index.html`.
-* All logic lives in `file-system.js`; styles in `styles.css`. ([GitHub][1])
+* All logic lives in `file-system.js`; styles in `styles.css`.
 
 ```
 /index.html
@@ -14,8 +14,6 @@ I built a **from-scratch file system simulator** that runs in the browser. It mo
 /styles.css
 /.idea/            # editor config (ignored by runtime)
 ```
-
-([GitHub][1])
 
 ## Goals
 
